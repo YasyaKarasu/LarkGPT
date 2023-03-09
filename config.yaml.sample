@@ -1,0 +1,14 @@
+feishu:
+  appId:
+  appSecret:
+  verificationToken:
+  encryptKey:
+redis:
+  host:
+  port:
+  password:
+  db:
+server:
+  port:
+chatgpt:
+  openaiKey:
