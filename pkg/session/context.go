@@ -20,7 +20,7 @@ func SetContextSession(ID string, content string) error {
 func GetContextSession(ID string) string {
 	content, err := redisClient.Get(context.Background(), ID).Result()
 	if err == redis.Nil {
-		logrus.WithField("ID", ID).Warn("key does not exist.")
+		logrus.WithField("ID", ID).Warn("key does not exist")
 		return ""
 	} else if err != nil {
 		logrus.WithField("ID", ID).Error(err)
