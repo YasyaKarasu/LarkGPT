@@ -27,6 +27,7 @@ var C Config
 func ReadConfig() {
 	viper.SetConfigName("config")
 	viper.AddConfigPath("./")
+	viper.AddConfigPath("/etc/LarkGPT")
 
 	if err := viper.ReadInConfig(); err != nil {
 		logrus.Panic(err)
