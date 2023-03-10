@@ -62,7 +62,7 @@ func Dispatcher(c *gin.Context) {
 
 	if eventRepeatDetect(req.EventId) {
 		logrus.Warning("Repeated event: ", req)
-		c.String(http.StatusBadRequest, "事件重复")
+		c.String(http.StatusOK, "事件重复")
 		return
 	}
 
