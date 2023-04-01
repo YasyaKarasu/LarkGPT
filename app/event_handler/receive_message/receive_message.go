@@ -2,6 +2,7 @@ package receiveMessage
 
 import (
 	"encoding/json"
+	"strings"
 	"xlab-feishu-robot/pkg/session"
 
 	"github.com/sirupsen/logrus"
@@ -53,14 +54,7 @@ func Receive(event map[string]any) {
 	}
 	session.StoreMessageID(messageevent.Message.Message_id)
 
-	flag := true
-	for _, mention := range messageevent.Message.Mentions {
-		if mention.Key == "@all" {
-			flag = false
-			break
-		}
-	}
-	if !flag {
+	if strings.Contains(messageevent.Message.Content, "@_all") {
 		logrus.WithField("messageID", messageevent.Message.Message_id).Warn("Receive message, but this message contains @all")
 		return
 	}
