@@ -129,7 +129,6 @@ func (c *ChatContext) SetPreset(preset string) {
 }
 
 func (c *ChatGPT) ChatWithContext(question string) (answer string, err error) {
-	question = question + "."
 	if len(question) > c.maxQuestionLen {
 		return "", OverMaxQuestionLength
 	}
@@ -154,6 +153,10 @@ func (c *ChatGPT) ChatWithContext(question string) (answer string, err error) {
 			})
 		}
 	}
+	promptTable = append(promptTable, gogpt.ChatCompletionMessage{
+		Role:    openai.ChatMessageRoleUser,
+		Content: question,
+	})
 	req := gogpt.ChatCompletionRequest{
 		Model:            gogpt.GPT3Dot5Turbo,
 		MaxTokens:        c.maxAnswerLen,
