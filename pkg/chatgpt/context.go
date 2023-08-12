@@ -7,6 +7,7 @@ import (
 	"strings"
 	"xlab-feishu-robot/pkg/session"
 
+	"github.com/sashabaranov/go-openai"
 	gogpt "github.com/sashabaranov/go-openai"
 )
 
@@ -139,26 +140,24 @@ func (c *ChatGPT) ChatWithContext(question string) (answer string, err error) {
 			return "", OverMaxSequenceTimes
 		}
 	}
-	var promptTable []string
-	promptTable = append(promptTable, c.ChatContext.background)
-	promptTable = append(promptTable, c.ChatContext.preset)
+	var promptTable []gogpt.ChatCompletionMessage
 	for _, v := range c.ChatContext.old {
 		if v.Role == c.ChatContext.humanRole {
-			promptTable = append(promptTable, "\n"+v.Role.Name+": "+v.Prompt)
+			promptTable = append(promptTable, gogpt.ChatCompletionMessage{
+				Role:    openai.ChatMessageRoleUser,
+				Content: v.Prompt,
+			})
 		} else {
-			promptTable = append(promptTable, v.Role.Name+": "+v.Prompt)
+			promptTable = append(promptTable, gogpt.ChatCompletionMessage{
+				Role:    openai.ChatMessageRoleAssistant,
+				Content: v.Prompt,
+			})
 		}
 	}
-	promptTable = append(promptTable, "\n"+c.ChatContext.restartSeq+question)
-	prompt := strings.Join(promptTable, "\n")
-	prompt += c.ChatContext.startSeq
-	if len(prompt) > c.maxText-c.maxAnswerLen {
-		return "", OverMaxTextLength
-	}
-	req := gogpt.CompletionRequest{
+	req := gogpt.ChatCompletionRequest{
 		Model:            gogpt.GPT432K0613,
 		MaxTokens:        c.maxAnswerLen,
-		Prompt:           prompt,
+		Messages:         promptTable,
 		Temperature:      0.9,
 		TopP:             1,
 		N:                1,
@@ -167,21 +166,21 @@ func (c *ChatGPT) ChatWithContext(question string) (answer string, err error) {
 		User:             c.userId,
 		Stop:             []string{c.ChatContext.aiRole.Name + ":", c.ChatContext.humanRole.Name + ":"},
 	}
-	resp, err := c.client.CreateCompletion(c.ctx, req)
+	resp, err := c.client.CreateChatCompletion(c.ctx, req)
 	if err != nil {
 		return "", err
 	}
-	resp.Choices[0].Text = formatAnswer(resp.Choices[0].Text)
+	resp.Choices[0].Message.Content = formatAnswer(resp.Choices[0].Message.Content)
 	c.ChatContext.old = append(c.ChatContext.old, conversation{
 		Role:   c.ChatContext.humanRole,
 		Prompt: question,
 	})
 	c.ChatContext.old = append(c.ChatContext.old, conversation{
 		Role:   c.ChatContext.aiRole,
-		Prompt: resp.Choices[0].Text,
+		Prompt: resp.Choices[0].Message.Content,
 	})
 	c.ChatContext.seqTimes++
-	return resp.Choices[0].Text, nil
+	return resp.Choices[0].Message.Content, nil
 }
 
 func WithMaxSeqTimes(times int) ChatContextOption {
