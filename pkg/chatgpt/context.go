@@ -156,7 +156,7 @@ func (c *ChatGPT) ChatWithContext(question string) (answer string, err error) {
 		return "", OverMaxTextLength
 	}
 	req := gogpt.CompletionRequest{
-		Model:            gogpt.GPT432K0314,
+		Model:            gogpt.GPT432K0613,
 		MaxTokens:        c.maxAnswerLen,
 		Prompt:           prompt,
 		Temperature:      0.9,

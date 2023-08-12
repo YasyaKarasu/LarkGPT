@@ -6,7 +6,7 @@ require (
 	github.com/YasyaKarasu/feishuapi v1.1.23
 	github.com/gin-gonic/gin v1.8.1
 	github.com/redis/go-redis/v9 v9.0.2
-	github.com/sashabaranov/go-openai v1.5.2
+	github.com/sashabaranov/go-openai v1.14.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/viper v1.13.0
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a
